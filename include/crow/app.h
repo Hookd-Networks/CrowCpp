@@ -9,6 +9,7 @@
 #include <type_traits>
 #include <thread>
 #include <condition_variable>
+#include <variant>
 
 #include "crow/version.h"
 #include "crow/settings.h"
@@ -78,8 +79,15 @@ namespace crow
 
         /// Process only the method and URL of a request and provide a route (or an error response)
         std::unique_ptr<routing_handle_result> handle_initial(request& req, response& res)
-        {
-            return router_.handle_initial(req, res);
+        {            
+            auto router_result = router_.handle_initial(req, res);
+            bool middleware_present = true ;
+            if(middleware_present ){
+                crow::CORSHandler cors = std::get<crow::CORSHandler>(middlewares_);
+                crow::CORSHandler::context ctx;
+                cors.after_handle(req, res, ctx);
+            }
+            return router_result;         
         }
 
         /// Process the fully parsed request and generate a response for it

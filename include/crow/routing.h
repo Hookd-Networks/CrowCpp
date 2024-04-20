@@ -1574,7 +1574,7 @@ namespace crow
                         }
                     }
                     allow = allow.substr(0, allow.size() - 2);
-                    res = response(204);
+                    res = response(200);
                     res.set_header("Allow", allow);
                     res.end();
                     found->method = method_actual;
